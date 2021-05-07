@@ -3,6 +3,7 @@ use PT_FIRSTMACH;
 pub type c_long = i64;
 pub type c_ulong = u64;
 pub type c_char = i8;
+pub type c_greg_t = u64;
 pub type __cpu_simple_lock_nv_t = ::c_uchar;
 
 // should be pub(crate), but that requires Rust 1.18.0
@@ -21,3 +22,20 @@ pub const PT_GETREGS: ::c_int = PT_FIRSTMACH + 1;
 pub const PT_SETREGS: ::c_int = PT_FIRSTMACH + 2;
 pub const PT_GETFPREGS: ::c_int = PT_FIRSTMACH + 3;
 pub const PT_SETFPREGS: ::c_int = PT_FIRSTMACH + 4;
+
+s_no_extra_traits! {
+    #[repr(align(8))]
+    pub struct mcontext_t {
+        pub __gregs: [c_greg_t; 26],
+        pub _mc_tlsbase: c_greg_t,
+        pub __fpregs: [::c_char; 512],
+    }
+
+    pub struct ucontext_t {
+        pub uc_flags: ::c_uint,
+        pub uc_link: *mut ::ucontext_t,
+        pub uc_sigmask: ::sigset_t,
+        pub uc_stack: ::stack_t,
+        pub uc_mcontext: ::mcontext_t,
+    }
+}
